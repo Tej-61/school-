@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NoteShare – Friends</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box;margin:0;padding:0; }
+    :root { --bg:#0f1117;--card:#181c27;--accent:#6c63ff;--accent2:#a78bfa;--text:#f0f0f5;--muted:#8b8fa8;--border:#2a2e3d;--green:#22c55e; }
+    body { font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex; }
+
+    .sidebar { width:240px;min-height:100vh;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:28px 16px;position:fixed;left:0;top:0; }
+    .logo { display:flex;align-items:center;gap:10px;padding:0 8px;margin-bottom:36px; }
+    .logo-icon { width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px; }
+    .logo span { font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px; }
+    .nav-label { font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:0 12px;margin-bottom:8px; }
+    .nav-item { display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:all .2s;margin-bottom:4px; }
+    .nav-item:hover { background:rgba(108,99,255,.1);color:var(--text); }
+    .nav-item.active { background:linear-gradient(135deg,rgba(108,99,255,.25),rgba(167,139,250,.15));color:var(--accent2); }
+    .nav-item .icon { font-size:18px;width:22px;text-align:center; }
+    .sidebar-footer { margin-top:auto;border-top:1px solid var(--border);padding-top:16px; }
+    .user-chip { display:flex;align-items:center;gap:10px;padding:10px; }
+    .avatar-sm { width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;flex-shrink:0; }
+    .user-name { font-size:13px;font-weight:600; }
+    .user-role { font-size:11px;color:var(--muted); }
+
+    .main { margin-left:240px;flex:1;padding:36px 40px; }
+    .page-header { margin-bottom:28px; }
+    .page-header h2 { font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700; }
+    .page-header p { color:var(--muted);font-size:14px;margin-top:4px; }
+
+    /* SEARCH BAR */
+    .add-friend-bar { display:flex;gap:10px;margin-bottom:32px; }
+    .add-friend-bar input { flex:1;padding:12px 16px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none;transition:border-color .2s; }
+    .add-friend-bar input:focus { border-color:var(--accent); }
+    .add-friend-bar input::placeholder { color:var(--muted); }
+    .btn-add { padding:12px 22px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap; }
+
+    /* TABS */
+    .tabs { display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid var(--border); }
+    .tab { padding:10px 20px;border:none;background:none;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;margin-bottom:-1px; }
+    .tab.active { color:var(--accent2);border-bottom-color:var(--accent); }
+
+    /* FRIENDS GRID */
+    .friends-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px; }
+    .friend-card { background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;transition:all .25s; }
+    .friend-card:hover { border-color:var(--accent);transform:translateY(-2px); }
+    .friend-top { display:flex;align-items:center;gap:14px;margin-bottom:14px; }
+    .f-avatar { width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;flex-shrink:0; }
+    .f-name { font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600; }
+    .f-class { font-size:12px;color:var(--muted);margin-top:2px; }
+    .online-dot { display:inline-block;width:8px;height:8px;border-radius:50%;background:#6b7280;margin-right:4px; }
+    .online-dot.online { background:var(--green); }
+    .f-status { font-size:12px;color:var(--muted); }
+    .f-stats { display:flex;gap:12px;margin-bottom:14px; }
+    .f-stat { text-align:center;flex:1; }
+    .f-stat-num { font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700; }
+    .f-stat-label { font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px; }
+    .f-actions { display:flex;gap:8px; }
+    .btn-msg { flex:1;padding:8px;background:rgba(108,99,255,.12);border:none;border-radius:8px;color:var(--accent2);font-size:13px;font-weight:600;cursor:pointer;transition:background .2s; }
+    .btn-msg:hover { background:rgba(108,99,255,.22); }
+    .btn-remove { padding:8px 10px;background:transparent;border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-size:13px;cursor:pointer;transition:all .2s; }
+    .btn-remove:hover { border-color:#f87171;color:#f87171; }
+
+    /* REQUESTS */
+    .request-card { background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:16px;margin-bottom:12px; }
+    .req-info { flex:1; }
+    .req-name { font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600; }
+    .req-meta { font-size:12px;color:var(--muted);margin-top:2px; }
+    .req-actions { display:flex;gap:8px; }
+    .btn-accept { padding:8px 16px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer; }
+    .btn-decline { padding:8px 16px;background:transparent;border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-size:13px;cursor:pointer;transition:all .2s; }
+    .btn-decline:hover { border-color:#f87171;color:#f87171; }
+
+    .badge { display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase; }
+    .badge-req { background:rgba(251,191,36,.15);color:#f59e0b; }
+
+    .toast { position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green);color:#fff;padding:12px 24px;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;transition:transform .35s;z-index:99; }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo"><div class="logo-icon">📚</div><span>NoteShare</span></div>
+    <div class="nav-label">Menu</div>
+    <a href="dashboard.html" class="nav-item"><span class="icon">🏠</span> Dashboard</a>
+    <a href="send.html" class="nav-item"><span class="icon">📤</span> Send Notes</a>
+    <a href="receive.html" class="nav-item"><span class="icon">📥</span> Receive Notes</a>
+    <a href="friends.html" class="nav-item active"><span class="icon">👥</span> Friends</a>
+    <a href="profile.html" class="nav-item"><span class="icon">👤</span> Profile</a>
+    <div class="sidebar-footer">
+      <div class="user-chip">
+        <div class="avatar-sm" id="sb-avatar">?</div>
+        <div><div class="user-name" id="sb-name">Student</div><div class="user-role">Student</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-header">
+      <h2>👥 Friends</h2>
+      <p>Manage classmates you share notes with</p>
+    </div>
+
+    <div class="add-friend-bar">
+      <input type="text" id="friend-search" placeholder="Search by name or student ID to add a friend…"/>
+      <button class="btn-add" onclick="sendRequest()">+ Add Friend</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('friends', this)">My Friends <span id="friends-count">(5)</span></button>
+      <button class="tab" onclick="switchTab('requests', this)">Requests <span class="badge badge-req" id="req-count">2</span></button>
+    </div>
+
+    <!-- FRIENDS TAB -->
+    <div id="tab-friends">
+      <div class="friends-grid" id="friends-grid"></div>
+    </div>
+
+    <!-- REQUESTS TAB -->
+    <div id="tab-requests" style="display:none">
+      <div id="requests-list"></div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem('ns_user') || '{"name":"Student"}');
+    document.getElementById('sb-name').textContent = user.name;
+    document.getElementById('sb-avatar').textContent = (user.name||'S').slice(0,2).toUpperCase();
+
+    const avatarColors = ['#f59e0b,#ef4444','#6c63ff,#a78bfa','#22c55e,#16a34a','#06b6d4,#0284c7','#ec4899,#f43f5e'];
+
+    let friends = [
+      { id:1, name:'Ali Hassan', initials:'AH', cls:'Class 10-A', online:true, sent:12, received:8, color:0 },
+      { id:2, name:'Sara Khan', initials:'SK', cls:'Class 10-B', online:true, sent:6, received:14, color:1 },
+      { id:3, name:'Usman Ali', initials:'UA', cls:'Class 11-A', online:false, sent:9, received:5, color:2 },
+      { id:4, name:'Ayesha Malik', initials:'AM', cls:'Class 10-A', online:false, sent:3, received:7, color:3 },
+      { id:5, name:'Bilal Ahmed', initials:'BA', cls:'Class 10-C', online:true, sent:11, received:10, color:4 },
+    ];
+
+    let requests = [
+      { id:10, name:'Fatima Noor', initials:'FN', cls:'Class 10-A', mutual:3, color:1 },
+      { id:11, name:'Hassan Raza', initials:'HR', cls:'Class 11-B', mutual:1, color:2 },
+    ];
+
+    function renderFriends() {
+      document.getElementById('friends-count').textContent = `(${friends.length})`;
+      document.getElementById('friends-grid').innerHTML = friends.map(f => `
+        <div class="friend-card" id="fc-${f.id}">
+          <div class="friend-top">
+            <div class="f-avatar" style="background:linear-gradient(135deg,${avatarColors[f.color]})">${f.initials}</div>
+            <div>
+              <div class="f-name">${f.name}</div>
+              <div class="f-class">${f.cls}</div>
+              <div class="f-status"><span class="online-dot ${f.online ? 'online' : ''}"></span>${f.online ? 'Online now' : 'Offline'}</div>
+            </div>
+          </div>
+          <div class="f-stats">
+            <div class="f-stat"><div class="f-stat-num">${f.sent}</div><div class="f-stat-label">Sent</div></div>
+            <div class="f-stat"><div class="f-stat-num">${f.received}</div><div class="f-stat-label">Received</div></div>
+          </div>
+          <div class="f-actions">
+            <button class="btn-msg" onclick="window.location.href='send.html'">📤 Send Note</button>
+            <button class="btn-remove" onclick="removeFriend(${f.id})">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderRequests() {
+      document.getElementById('req-count').textContent = requests.length;
+      document.getElementById('requests-list').innerHTML = requests.length ? requests.map(r => `
+        <div class="request-card" id="rq-${r.id}">
+          <div class="f-avatar" style="background:linear-gradient(135deg,${avatarColors[r.color]});width:44px;height:44px;font-size:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:\'Space Grotesk\',sans-serif;font-weight:700;flex-shrink:0">${r.initials}</div>
+          <div class="req-info">
+            <div class="req-name">${r.name}</div>
+            <div class="req-meta">${r.cls} · ${r.mutual} mutual friend${r.mutual > 1 ? 's' : ''}</div>
+          </div>
+          <div class="req-actions">
+            <button class="btn-accept" onclick="acceptRequest(${r.id})">Accept</button>
+            <button class="btn-decline" onclick="declineRequest(${r.id})">Decline</button>
+          </div>
+        </div>
+      `).join('') : '<p style="color:var(--muted);text-align:center;padding:40px 0">No pending friend requests.</p>';
+    }
+
+    function removeFriend(id) {
+      friends = friends.filter(f => f.id !== id);
+      renderFriends();
+      showToast('Friend removed');
+    }
+
+    function acceptRequest(id) {
+      const r = requests.find(x => x.id === id);
+      if (r) {
+        friends.push({ id:r.id, name:r.name, initials:r.initials, cls:r.cls, online:false, sent:0, received:0, color:r.color });
+        requests = requests.filter(x => x.id !== id);
+        renderFriends();
+        renderRequests();
+        showToast(`✓ ${r.name} added as friend!`);
+      }
+    }
+
+    function declineRequest(id) {
+      requests = requests.filter(x => x.id !== id);
+      renderRequests();
+      showToast('Request declined');
+    }
+
+    function switchTab(tab, btn) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-friends').style.display = tab === 'friends' ? 'block' : 'none';
+      document.getElementById('tab-requests').style.display = tab === 'requests' ? 'block' : 'none';
+    }
+
+    function sendRequest() {
+      const name = document.getElementById('friend-search').value.trim();
+      if (!name) { showToast('Enter a name or ID', '#f87171'); return; }
+      document.getElementById('friend-search').value = '';
+      showToast(`✓ Friend request sent to ${name}!`);
+    }
+
+    function showToast(msg, bg = 'var(--green)') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.style.background = bg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    renderFriends();
+    renderRequests();
+  </script>
+</body>
+</html>
