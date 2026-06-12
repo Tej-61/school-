@@ -200,22 +200,22 @@
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-icon">📤</div>
-        <div class="stat-num">12</div>
+        <div class="stat-num" id="stat-sent">0</div>
         <div class="stat-label">Notes Sent</div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">📥</div>
-        <div class="stat-num">8</div>
+        <div class="stat-num" id="stat-received">0</div>
         <div class="stat-label">Notes Received</div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">👥</div>
-        <div class="stat-num">5</div>
+        <div class="stat-num" id="stat-friends">0</div>
         <div class="stat-label">Friends</div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">🔔</div>
-        <div class="stat-num">3</div>
+        <div class="stat-num" id="stat-unread">0</div>
         <div class="stat-label">Unread</div>
       </div>
     </div>
@@ -256,52 +256,12 @@
     <!-- RECENT -->
     <div class="two-col">
       <div class="panel">
-        <div class="section-title">Recent Received</div>
-        <div class="note-item">
-          <div class="note-dot"></div>
-          <div>
-            <div class="note-title">Chapter 5 – Organic Chemistry <span class="badge badge-new">New</span></div>
-            <div class="note-meta">From Ali Hassan · 2 hours ago</div>
-          </div>
-        </div>
-        <div class="note-item">
-          <div class="note-dot" style="background:#22c55e"></div>
-          <div>
-            <div class="note-title">Physics Formula Sheet</div>
-            <div class="note-meta">From Sara Khan · Yesterday</div>
-          </div>
-        </div>
-        <div class="note-item">
-          <div class="note-dot" style="background:#f59e0b"></div>
-          <div>
-            <div class="note-title">Math Past Papers 2024</div>
-            <div class="note-meta">From Usman Ali · 2 days ago</div>
-          </div>
-        </div>
+        <div class="section-title">Recently Sent</div>
+        <div id="recent-sent"></div>
       </div>
       <div class="panel">
-        <div class="section-title">Recently Sent</div>
-        <div class="note-item">
-          <div class="note-dot" style="background:#22c55e"></div>
-          <div>
-            <div class="note-title">English Essay Notes <span class="badge badge-sent">Sent</span></div>
-            <div class="note-meta">To Sara Khan · 1 hour ago</div>
-          </div>
-        </div>
-        <div class="note-item">
-          <div class="note-dot" style="background:#6c63ff"></div>
-          <div>
-            <div class="note-title">Biology Diagrams</div>
-            <div class="note-meta">To Class 10-A · 3 hours ago</div>
-          </div>
-        </div>
-        <div class="note-item">
-          <div class="note-dot" style="background:#a78bfa"></div>
-          <div>
-            <div class="note-title">History Timeline</div>
-            <div class="note-meta">To Usman Ali · Yesterday</div>
-          </div>
-        </div>
+        <div class="section-title">Abhi koi received notes nahi</div>
+        <p style="color:var(--muted);font-size:13px;margin-top:8px">Jab koi aapko note bhejega, yahan dikhega 📥</p>
       </div>
     </div>
   </main>
@@ -313,6 +273,29 @@
     document.getElementById('greet-name').textContent = name.charAt(0).toUpperCase() + name.slice(1);
     document.getElementById('sb-name').textContent = name;
     document.getElementById('sb-avatar').textContent = initials;
+
+    // Load real stats from localStorage
+    const sentNotes = JSON.parse(localStorage.getItem('ns_sent') || '[]');
+    document.getElementById('stat-sent').textContent = sentNotes.length;
+    document.getElementById('stat-received').textContent = 0;
+    document.getElementById('stat-friends').textContent = 0;
+    document.getElementById('stat-unread').textContent = 0;
+
+    // Show recent sent notes
+    const recentSentEl = document.getElementById('recent-sent');
+    if (sentNotes.length === 0) {
+      recentSentEl.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:12px 0">Abhi tak koi note send nahi kiya. <a href="send.html" style="color:var(--accent2)">Pehla note bhejo →</a></p>';
+    } else {
+      recentSentEl.innerHTML = sentNotes.slice(0, 4).map(n => `
+        <div class="note-item">
+          <div class="note-dot" style="background:var(--green)"></div>
+          <div>
+            <div class="note-title">${n.subject} <span class="badge badge-sent">Sent</span></div>
+            <div class="note-meta">To: ${n.to.join(', ')} · ${n.time}</div>
+          </div>
+        </div>
+      `).join('');
+    }
 
     function logout() {
       localStorage.removeItem('ns_user');
