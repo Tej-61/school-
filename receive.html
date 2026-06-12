@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NoteShare – Receive Notes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box;margin:0;padding:0; }
+    :root { --bg:#0f1117;--card:#181c27;--accent:#6c63ff;--accent2:#a78bfa;--text:#f0f0f5;--muted:#8b8fa8;--border:#2a2e3d;--green:#22c55e; }
+    body { font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex; }
+
+    .sidebar { width:240px;min-height:100vh;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:28px 16px;position:fixed;left:0;top:0; }
+    .logo { display:flex;align-items:center;gap:10px;padding:0 8px;margin-bottom:36px; }
+    .logo-icon { width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px; }
+    .logo span { font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px; }
+    .nav-label { font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:0 12px;margin-bottom:8px; }
+    .nav-item { display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:all .2s;margin-bottom:4px; }
+    .nav-item:hover { background:rgba(108,99,255,.1);color:var(--text); }
+    .nav-item.active { background:linear-gradient(135deg,rgba(108,99,255,.25),rgba(167,139,250,.15));color:var(--accent2); }
+    .nav-item .icon { font-size:18px;width:22px;text-align:center; }
+    .sidebar-footer { margin-top:auto;border-top:1px solid var(--border);padding-top:16px; }
+    .user-chip { display:flex;align-items:center;gap:10px;padding:10px; }
+    .avatar { width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;flex-shrink:0; }
+    .user-name { font-size:13px;font-weight:600; }
+    .user-role { font-size:11px;color:var(--muted); }
+
+    .main { margin-left:240px;flex:1;padding:36px 40px; }
+    .page-header { display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px; }
+    .page-header h2 { font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700; }
+    .page-header p { color:var(--muted);font-size:14px;margin-top:4px; }
+    .mark-btn { padding:8px 16px;border:1.5px solid var(--border);background:transparent;border-radius:8px;color:var(--muted);font-size:13px;cursor:pointer;transition:all .2s; }
+    .mark-btn:hover { border-color:var(--accent2);color:var(--accent2); }
+
+    /* FILTERS */
+    .filters { display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap; }
+    .filter-btn { padding:7px 16px;border:1.5px solid var(--border);background:transparent;border-radius:20px;color:var(--muted);font-size:13px;cursor:pointer;transition:all .2s; }
+    .filter-btn.active { border-color:var(--accent);background:rgba(108,99,255,.12);color:var(--accent2); }
+    .search-bar { margin-left:auto; }
+    .search-bar input { padding:8px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;color:var(--text);font-size:13px;outline:none;width:200px;transition:border-color .2s; }
+    .search-bar input:focus { border-color:var(--accent); }
+
+    /* NOTE CARDS */
+    .notes-grid { display:flex;flex-direction:column;gap:12px; }
+
+    .note-card {
+      background:var(--card);border:1px solid var(--border);border-radius:14px;
+      padding:20px 22px;cursor:pointer;transition:all .25s;
+      display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;
+    }
+    .note-card:hover { border-color:var(--accent);box-shadow:0 4px 20px rgba(108,99,255,.12); }
+    .note-card.unread { border-left:3px solid var(--accent); }
+
+    .note-avatar { width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ef4444);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;flex-shrink:0; }
+
+    .note-main { overflow:hidden; }
+    .note-head { display:flex;align-items:center;gap:8px;margin-bottom:4px; }
+    .note-from { font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600; }
+    .note-subject { font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px; }
+    .note-preview { font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+
+    .note-right { text-align:right;flex-shrink:0; }
+    .note-time { font-size:12px;color:var(--muted);margin-bottom:6px; }
+
+    .badge { display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px; }
+    .badge-new { background:rgba(108,99,255,.2);color:var(--accent2); }
+    .badge-math { background:rgba(34,197,94,.12);color:var(--green); }
+    .badge-sci { background:rgba(251,191,36,.12);color:#f59e0b; }
+    .badge-eng { background:rgba(239,68,68,.12);color:#ef4444; }
+    .badge-urgent { background:rgba(239,68,68,.15);color:#ef4444; }
+
+    /* MODAL */
+    .modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:24px; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:var(--card);border:1px solid var(--border);border-radius:20px;width:100%;max-width:620px;max-height:85vh;overflow-y:auto; }
+    .modal-header { padding:24px 28px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between; }
+    .modal-title { font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700; }
+    .modal-meta { font-size:13px;color:var(--muted);margin-top:4px; }
+    .close-btn { background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1; }
+    .modal-body { padding:28px; }
+    .modal-body p { font-size:15px;line-height:1.8;color:var(--text); }
+    .modal-actions { padding:20px 28px;border-top:1px solid var(--border);display:flex;gap:10px; }
+    .btn-reply { padding:10px 20px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:8px;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;cursor:pointer; }
+    .btn-del { padding:10px 20px;border:1.5px solid #f87171;background:transparent;border-radius:8px;color:#f87171;font-size:14px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-weight:500; }
+    .btn-del:hover { background:rgba(248,113,113,.1); }
+
+    .empty-state { text-align:center;padding:64px 0;color:var(--muted); }
+    .empty-state .icon { font-size:48px;margin-bottom:12px; }
+    .empty-state h3 { font-family:'Space Grotesk',sans-serif;font-size:18px;color:var(--text);margin-bottom:6px; }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo"><div class="logo-icon">📚</div><span>NoteShare</span></div>
+    <div class="nav-label">Menu</div>
+    <a href="dashboard.html" class="nav-item"><span class="icon">🏠</span> Dashboard</a>
+    <a href="send.html" class="nav-item"><span class="icon">📤</span> Send Notes</a>
+    <a href="receive.html" class="nav-item active"><span class="icon">📥</span> Receive Notes</a>
+    <a href="friends.html" class="nav-item"><span class="icon">👥</span> Friends</a>
+    <a href="profile.html" class="nav-item"><span class="icon">👤</span> Profile</a>
+    <div class="sidebar-footer">
+      <div class="user-chip">
+        <div class="avatar" id="sb-avatar">?</div>
+        <div><div class="user-name" id="sb-name">Student</div><div class="user-role">Student</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-header">
+      <div>
+        <h2>📥 Received Notes</h2>
+        <p>Notes shared with you by classmates</p>
+      </div>
+      <button class="mark-btn" onclick="markAllRead()">Mark all as read</button>
+    </div>
+
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterNotes('all', this)">All</button>
+      <button class="filter-btn" onclick="filterNotes('unread', this)">Unread</button>
+      <button class="filter-btn" onclick="filterNotes('math', this)">📐 Math</button>
+      <button class="filter-btn" onclick="filterNotes('science', this)">🔬 Science</button>
+      <button class="filter-btn" onclick="filterNotes('english', this)">📖 English</button>
+      <div class="search-bar">
+        <input type="text" id="search" placeholder="🔍 Search notes…" oninput="searchNotes(this.value)"/>
+      </div>
+    </div>
+
+    <div class="notes-grid" id="notes-grid"></div>
+  </main>
+
+  <!-- NOTE MODAL -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="modal-title">Note Title</div>
+          <div class="modal-meta" id="modal-meta">From · Subject · Time</div>
+        </div>
+        <button class="close-btn" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p id="modal-body"></p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-reply" onclick="closeModal();window.location.href='send.html'">↩ Reply</button>
+        <button class="btn-del" onclick="deleteNote()">🗑 Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem('ns_user') || '{"name":"Student"}');
+    document.getElementById('sb-name').textContent = user.name;
+    document.getElementById('sb-avatar').textContent = (user.name||'S').slice(0,2).toUpperCase();
+
+    const colors = ['#f59e0b,#ef4444','#6c63ff,#a78bfa','#22c55e,#16a34a','#06b6d4,#0284c7','#ec4899,#f43f5e'];
+
+    const sampleNotes = [
+      { id:1, from:'Ali Hassan', initials:'AH', subject:'Chapter 5 – Organic Chemistry', category:'science', body:'Hey! Here are the complete notes for Chapter 5 – Organic Chemistry. I covered all the reactions, functional groups, and the IUPAC naming rules. Hope this helps before the exam. Let me know if you have questions!', time:'2 hours ago', unread:true, priority:'urgent' },
+      { id:2, from:'Sara Khan', initials:'SK', subject:'Physics Formula Sheet – Finals', category:'science', body:'Attached are all the key formulas for the physics final. Includes kinematics, thermodynamics, optics and electrostatics. Memorize the derivations too!', time:'Yesterday', unread:true, priority:'normal' },
+      { id:3, from:'Usman Ali', initials:'UA', subject:'Math Past Papers 2024 Solutions', category:'math', body:'Complete solutions for all 5 past papers. I spent the whole weekend on this — please don't share outside our group. The pattern for integration questions repeats every year.', time:'2 days ago', unread:false, priority:'low' },
+      { id:4, from:'Ayesha Malik', initials:'AM', subject:'English Essay Outline – Climate Change', category:'english', body:'Here\'s the full outline for the climate change essay. Introduction hook, 3 body paragraphs with topic sentences, and a strong conclusion. Model your paragraphs on these points.', time:'3 days ago', unread:false, priority:'normal' },
+      { id:5, from:'Bilal Ahmed', initials:'BA', subject:'History Timeline – World War 2', category:'math', body:'Complete chronological timeline from 1939–1945. Key events, dates, and their significance highlighted. Also includes the post-war settlements and Cold War origins.', time:'4 days ago', unread:false, priority:'low' },
+    ];
+
+    let notes = [...sampleNotes];
+    let activeFilter = 'all';
+    let openNoteId = null;
+
+    function renderNotes(list) {
+      const grid = document.getElementById('notes-grid');
+      if (!list.length) {
+        grid.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No notes here</h3><p>Your inbox is empty for this filter.</p></div>`;
+        return;
+      }
+      grid.innerHTML = list.map((n, i) => `
+        <div class="note-card ${n.unread ? 'unread' : ''}" onclick="openNote(${n.id})">
+          <div class="note-avatar" style="background:linear-gradient(135deg,${colors[i % colors.length]})">${n.initials}</div>
+          <div class="note-main">
+            <div class="note-head">
+              <span class="note-from">${n.from}</span>
+              ${n.unread ? '<span class="badge badge-new">New</span>' : ''}
+              ${n.priority === 'urgent' ? '<span class="badge badge-urgent">Urgent</span>' : ''}
+            </div>
+            <div class="note-subject">${n.subject}</div>
+            <div class="note-preview">${n.body.slice(0, 90)}…</div>
+          </div>
+          <div class="note-right">
+            <div class="note-time">${n.time}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterNotes(f, btn) {
+      activeFilter = f;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilter();
+    }
+
+    function applyFilter() {
+      let filtered = notes;
+      if (activeFilter === 'unread') filtered = notes.filter(n => n.unread);
+      else if (activeFilter !== 'all') filtered = notes.filter(n => n.category === activeFilter);
+      const q = document.getElementById('search').value.toLowerCase();
+      if (q) filtered = filtered.filter(n => n.subject.toLowerCase().includes(q) || n.from.toLowerCase().includes(q));
+      renderNotes(filtered);
+    }
+
+    function searchNotes(q) { applyFilter(); }
+
+    function openNote(id) {
+      const n = notes.find(x => x.id === id);
+      if (!n) return;
+      openNoteId = id;
+      n.unread = false;
+      document.getElementById('modal-title').textContent = n.subject;
+      document.getElementById('modal-meta').textContent = `From ${n.from} · ${n.time}`;
+      document.getElementById('modal-body').textContent = n.body;
+      document.getElementById('modal').classList.add('open');
+      applyFilter();
+    }
+    function closeModal() { document.getElementById('modal').classList.remove('open'); }
+    function deleteNote() { notes = notes.filter(n => n.id !== openNoteId); closeModal(); applyFilter(); }
+    function markAllRead() { notes.forEach(n => n.unread = false); applyFilter(); }
+
+    document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+    renderNotes(sampleNotes);
+  </script>
+</body>
+</html>
