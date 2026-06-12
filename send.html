@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NoteShare – Send Notes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#0f1117;--card:#181c27;--accent:#6c63ff;--accent2:#a78bfa;--text:#f0f0f5;--muted:#8b8fa8;--border:#2a2e3d;--green:#22c55e; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; }
+
+    .sidebar { width:240px;min-height:100vh;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:28px 16px;position:fixed;left:0;top:0; }
+    .logo { display:flex;align-items:center;gap:10px;padding:0 8px;margin-bottom:36px; }
+    .logo-icon { width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px; }
+    .logo span { font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px; }
+    .nav-label { font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:0 12px;margin-bottom:8px; }
+    .nav-item { display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:all .2s;margin-bottom:4px; }
+    .nav-item:hover { background:rgba(108,99,255,.1);color:var(--text); }
+    .nav-item.active { background:linear-gradient(135deg,rgba(108,99,255,.25),rgba(167,139,250,.15));color:var(--accent2); }
+    .nav-item .icon { font-size:18px;width:22px;text-align:center; }
+    .sidebar-footer { margin-top:auto;border-top:1px solid var(--border);padding-top:16px; }
+    .user-chip { display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px; }
+    .avatar { width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;flex-shrink:0; }
+    .user-name { font-size:13px;font-weight:600; }
+    .user-role { font-size:11px;color:var(--muted); }
+
+    .main { margin-left:240px;flex:1;padding:36px 40px; }
+    .page-header { margin-bottom:32px; }
+    .page-header h2 { font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700; }
+    .page-header p { color:var(--muted);font-size:14px;margin-top:4px; }
+
+    .compose-grid { display:grid;grid-template-columns:1fr 340px;gap:24px; }
+
+    .card { background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px; }
+    .card-title { font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;margin-bottom:20px; }
+
+    .form-group { margin-bottom:18px; }
+    label { display:block;font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px; }
+    input, select, textarea {
+      width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;
+      color:var(--text);font-family:'Inter',sans-serif;font-size:14px;transition:border-color .2s,box-shadow .2s;outline:none;
+    }
+    input:focus, select:focus, textarea:focus { border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,99,255,.15); }
+    textarea { resize:vertical;min-height:200px;line-height:1.6; }
+    select option { background:var(--card); }
+
+    /* recipient tags */
+    .recipient-wrap {
+      background:var(--bg);border:1.5px solid var(--border);border-radius:10px;
+      padding:8px;display:flex;flex-wrap:wrap;gap:6px;min-height:44px;cursor:text;
+    }
+    .recipient-wrap:focus-within { border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,99,255,.15); }
+    .tag {
+      display:flex;align-items:center;gap:6px;background:rgba(108,99,255,.2);color:var(--accent2);
+      padding:3px 10px;border-radius:20px;font-size:13px;font-weight:500;
+    }
+    .tag button { background:none;border:none;color:var(--accent2);cursor:pointer;font-size:14px;line-height:1; }
+    .tag-input { background:none;border:none;outline:none;color:var(--text);font-size:14px;min-width:120px;padding:4px; }
+
+    /* file drop */
+    .drop-zone {
+      border:2px dashed var(--border);border-radius:12px;padding:28px;text-align:center;
+      transition:all .2s;cursor:pointer;
+    }
+    .drop-zone:hover, .drop-zone.dragover { border-color:var(--accent);background:rgba(108,99,255,.05); }
+    .drop-icon { font-size:32px;margin-bottom:8px; }
+    .drop-text { font-size:14px;color:var(--muted); }
+    .drop-text span { color:var(--accent2);cursor:pointer; }
+    #file-input { display:none; }
+    .file-list { margin-top:12px; }
+    .file-item { display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg);border-radius:8px;margin-bottom:6px;font-size:13px; }
+    .file-item .remove { margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px; }
+
+    /* priority */
+    .priority-group { display:flex;gap:8px; }
+    .pri-btn { flex:1;padding:8px;border:1.5px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;text-align:center; }
+    .pri-btn.sel-low { border-color:var(--green);color:var(--green);background:rgba(34,197,94,.1); }
+    .pri-btn.sel-normal { border-color:var(--accent);color:var(--accent2);background:rgba(108,99,255,.1); }
+    .pri-btn.sel-urgent { border-color:#f87171;color:#f87171;background:rgba(248,113,113,.1); }
+
+    .btn-send {
+      width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border:none;border-radius:10px;color:#fff;font-family:'Space Grotesk',sans-serif;
+      font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s,transform .15s;
+      box-shadow:0 4px 16px rgba(108,99,255,.35);
+    }
+    .btn-send:hover { opacity:.9;transform:translateY(-1px); }
+
+    /* sent list */
+    .sent-item { padding:14px 0;border-bottom:1px solid var(--border); }
+    .sent-item:last-child { border-bottom:none; }
+    .sent-row { display:flex;align-items:center;justify-content:space-between; }
+    .sent-title { font-size:14px;font-weight:500; }
+    .sent-to { font-size:12px;color:var(--muted);margin-top:3px; }
+    .badge { display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;text-transform:uppercase; }
+    .badge-sent { background:rgba(34,197,94,.15);color:var(--green); }
+    .badge-pending { background:rgba(251,191,36,.15);color:#f59e0b; }
+
+    .success-banner {
+      position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+      background:var(--green);color:#fff;padding:12px 24px;border-radius:10px;
+      font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;
+      transition:transform .35s;z-index:99;
+    }
+    .success-banner.show { transform:translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo"><div class="logo-icon">📚</div><span>NoteShare</span></div>
+    <div class="nav-label">Menu</div>
+    <a href="dashboard.html" class="nav-item"><span class="icon">🏠</span> Dashboard</a>
+    <a href="send.html" class="nav-item active"><span class="icon">📤</span> Send Notes</a>
+    <a href="receive.html" class="nav-item"><span class="icon">📥</span> Receive Notes</a>
+    <a href="friends.html" class="nav-item"><span class="icon">👥</span> Friends</a>
+    <a href="profile.html" class="nav-item"><span class="icon">👤</span> Profile</a>
+    <div class="sidebar-footer">
+      <div class="user-chip">
+        <div class="avatar" id="sb-avatar">?</div>
+        <div><div class="user-name" id="sb-name">Student</div><div class="user-role">Student</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-header">
+      <h2>📤 Send Notes</h2>
+      <p>Compose and share notes with your classmates</p>
+    </div>
+
+    <div class="compose-grid">
+      <!-- COMPOSE FORM -->
+      <div class="card">
+        <div class="card-title">Compose Note</div>
+
+        <div class="form-group">
+          <label>To (Recipients)</label>
+          <div class="recipient-wrap" id="recipient-wrap" onclick="document.getElementById('tag-input').focus()">
+            <input class="tag-input" id="tag-input" placeholder="Type a name and press Enter…" onkeydown="addTag(event)"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Subject</label>
+          <input type="text" id="note-subject" placeholder="e.g. Chapter 5 – Organic Chemistry Notes"/>
+        </div>
+
+        <div class="form-group">
+          <label>Subject / Class</label>
+          <select id="note-class">
+            <option value="">Select class…</option>
+            <option>Mathematics</option>
+            <option>Physics</option>
+            <option>Chemistry</option>
+            <option>Biology</option>
+            <option>English</option>
+            <option>History</option>
+            <option>Computer Science</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Message</label>
+          <textarea id="note-body" placeholder="Write your note content here…"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Priority</label>
+          <div class="priority-group">
+            <button class="pri-btn sel-low" onclick="setPriority('low', this)">🟢 Low</button>
+            <button class="pri-btn" onclick="setPriority('normal', this)">🔵 Normal</button>
+            <button class="pri-btn" onclick="setPriority('urgent', this)">🔴 Urgent</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Attachments</label>
+          <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDrag(event,true)" ondragleave="handleDrag(event,false)" ondrop="handleDrop(event)">
+            <div class="drop-icon">📎</div>
+            <div class="drop-text">Drag & drop files or <span>Browse</span></div>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px">PDF, DOCX, PNG, JPG — up to 20MB each</div>
+          </div>
+          <input type="file" id="file-input" multiple onchange="addFiles(this.files)"/>
+          <div class="file-list" id="file-list"></div>
+        </div>
+
+        <button class="btn-send" onclick="sendNote()">Send Note →</button>
+      </div>
+
+      <!-- SENT NOTES SIDEBAR -->
+      <div>
+        <div class="card">
+          <div class="card-title">Sent Notes</div>
+          <div id="sent-list">
+            <div class="sent-item">
+              <div class="sent-row">
+                <div class="sent-title">English Essay Notes</div>
+                <span class="badge badge-sent">Sent</span>
+              </div>
+              <div class="sent-to">To: Sara Khan · 1h ago</div>
+            </div>
+            <div class="sent-item">
+              <div class="sent-row">
+                <div class="sent-title">Biology Diagrams</div>
+                <span class="badge badge-sent">Sent</span>
+              </div>
+              <div class="sent-to">To: Class 10-A · 3h ago</div>
+            </div>
+            <div class="sent-item">
+              <div class="sent-row">
+                <div class="sent-title">History Timeline</div>
+                <span class="badge badge-pending">Pending</span>
+              </div>
+              <div class="sent-to">To: Usman Ali · Yesterday</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="success-banner" id="banner">✓ Note sent successfully!</div>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem('ns_user') || '{"name":"Student"}');
+    document.getElementById('sb-name').textContent = user.name;
+    document.getElementById('sb-avatar').textContent = (user.name||'S').slice(0,2).toUpperCase();
+
+    let tags = [], priority = 'low', attachedFiles = [];
+
+    function addTag(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const v = e.target.value.trim();
+        if (v && !tags.includes(v)) {
+          tags.push(v);
+          const tag = document.createElement('div');
+          tag.className = 'tag';
+          tag.innerHTML = `${v}<button onclick="removeTag('${v}', this.parentElement)">×</button>`;
+          document.getElementById('recipient-wrap').insertBefore(tag, e.target);
+        }
+        e.target.value = '';
+      }
+    }
+    function removeTag(val, el) { tags = tags.filter(t => t !== val); el.remove(); }
+
+    function setPriority(p, btn) {
+      priority = p;
+      document.querySelectorAll('.pri-btn').forEach(b => b.className = 'pri-btn');
+      btn.classList.add(`sel-${p}`);
+    }
+
+    function addFiles(files) {
+      [...files].forEach(f => {
+        attachedFiles.push(f);
+        const el = document.createElement('div');
+        el.className = 'file-item';
+        el.innerHTML = `📄 ${f.name} <span style="color:var(--muted);font-size:11px">(${(f.size/1024).toFixed(1)} KB)</span><button class="remove" onclick="this.parentElement.remove()">×</button>`;
+        document.getElementById('file-list').appendChild(el);
+      });
+    }
+
+    function handleDrag(e, over) { e.preventDefault(); document.getElementById('drop-zone').classList.toggle('dragover', over); }
+    function handleDrop(e) { e.preventDefault(); handleDrag(e, false); addFiles(e.dataTransfer.files); }
+
+    function sendNote() {
+      const subject = document.getElementById('note-subject').value.trim();
+      const body    = document.getElementById('note-body').value.trim();
+      if (!tags.length || !subject || !body) { alert('Please fill in recipients, subject, and message.'); return; }
+
+      // Save to localStorage
+      const sent = JSON.parse(localStorage.getItem('ns_sent') || '[]');
+      const note = { id: Date.now(), subject, body, to: tags, priority, time: new Date().toLocaleString() };
+      sent.unshift(note);
+      localStorage.setItem('ns_sent', JSON.stringify(sent));
+
+      // Reset form
+      tags = []; attachedFiles = [];
+      document.getElementById('recipient-wrap').querySelectorAll('.tag').forEach(t => t.remove());
+      document.getElementById('tag-input').value = '';
+      document.getElementById('note-subject').value = '';
+      document.getElementById('note-body').value = '';
+      document.getElementById('file-list').innerHTML = '';
+
+      // Show banner
+      const banner = document.getElementById('banner');
+      banner.classList.add('show');
+      setTimeout(() => banner.classList.remove('show'), 3000);
+
+      // Prepend to sent list
+      const el = document.createElement('div');
+      el.className = 'sent-item';
+      el.innerHTML = `<div class="sent-row"><div class="sent-title">${subject}</div><span class="badge badge-sent">Sent</span></div><div class="sent-to">To: ${note.to.join(', ')} · Just now</div>`;
+      document.getElementById('sent-list').prepend(el);
+    }
+  </script>
+</body>
+</html>
