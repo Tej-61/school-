@@ -137,19 +137,20 @@
         <div class="form-group">
           <label>To (Recipients)</label>
           <div class="recipient-wrap" id="recipient-wrap" onclick="document.getElementById('tag-input').focus()">
-            <input class="tag-input" id="tag-input" placeholder="Type a name and press Enter…" onkeydown="addTag(event)"/>
+            <input class="tag-input" id="tag-input" placeholder="Naam likho aur Enter dabao…" onkeydown="addTag(event)"/>
           </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:5px">💡 Naam likh ke <b style="color:var(--accent2)">Enter</b> dabao — ek se zyada log bhi add kar sakte ho</div>
         </div>
 
         <div class="form-group">
-          <label>Subject</label>
+          <label>Note Title / Subject</label>
           <input type="text" id="note-subject" placeholder="e.g. Chapter 5 – Organic Chemistry Notes"/>
         </div>
 
         <div class="form-group">
-          <label>Subject / Class</label>
+          <label>Class / Topic Category</label>
           <select id="note-class">
-            <option value="">Select class…</option>
+            <option value="">Select category…</option>
             <option>Mathematics</option>
             <option>Physics</option>
             <option>Chemistry</option>
@@ -194,27 +195,7 @@
         <div class="card">
           <div class="card-title">Sent Notes</div>
           <div id="sent-list">
-            <div class="sent-item">
-              <div class="sent-row">
-                <div class="sent-title">English Essay Notes</div>
-                <span class="badge badge-sent">Sent</span>
-              </div>
-              <div class="sent-to">To: Sara Khan · 1h ago</div>
-            </div>
-            <div class="sent-item">
-              <div class="sent-row">
-                <div class="sent-title">Biology Diagrams</div>
-                <span class="badge badge-sent">Sent</span>
-              </div>
-              <div class="sent-to">To: Class 10-A · 3h ago</div>
-            </div>
-            <div class="sent-item">
-              <div class="sent-row">
-                <div class="sent-title">History Timeline</div>
-                <span class="badge badge-pending">Pending</span>
-              </div>
-              <div class="sent-to">To: Usman Ali · Yesterday</div>
-            </div>
+            <p style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">Abhi tak koi note send nahi kiya 📭</p>
           </div>
         </div>
       </div>
@@ -229,6 +210,26 @@
     document.getElementById('sb-avatar').textContent = (user.name||'S').slice(0,2).toUpperCase();
 
     let tags = [], priority = 'low', attachedFiles = [];
+
+    // Load sent notes from localStorage on page load
+    function loadSentList() {
+      const sent = JSON.parse(localStorage.getItem('ns_sent') || '[]');
+      const list = document.getElementById('sent-list');
+      if (sent.length === 0) {
+        list.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">Abhi tak koi note send nahi kiya 📭</p>';
+        return;
+      }
+      list.innerHTML = sent.slice(0, 10).map(n => `
+        <div class="sent-item">
+          <div class="sent-row">
+            <div class="sent-title">${n.subject}</div>
+            <span class="badge badge-sent">Sent</span>
+          </div>
+          <div class="sent-to">To: ${n.to.join(', ')} · ${n.time}</div>
+        </div>
+      `).join('');
+    }
+    loadSentList();
 
     function addTag(e) {
       if (e.key === 'Enter') {
@@ -266,13 +267,29 @@
     function handleDrop(e) { e.preventDefault(); handleDrag(e, false); addFiles(e.dataTransfer.files); }
 
     function sendNote() {
+      // Agar koi naam type kiya ho lekin Enter nahi kiya, usse bhi add kar lo
+      const inputVal = document.getElementById('tag-input').value.trim();
+      if (inputVal && !tags.includes(inputVal)) {
+        tags.push(inputVal);
+        const tag = document.createElement('div');
+        tag.className = 'tag';
+        tag.innerHTML = `${inputVal}<button onclick="removeTag('${inputVal}', this.parentElement)">×</button>`;
+        const inp = document.getElementById('tag-input');
+        document.getElementById('recipient-wrap').insertBefore(tag, inp);
+        inp.value = '';
+      }
+
       const subject = document.getElementById('note-subject').value.trim();
       const body    = document.getElementById('note-body').value.trim();
-      if (!tags.length || !subject || !body) { alert('Please fill in recipients, subject, and message.'); return; }
+
+      if (!tags.length) { showError('⚠️ Recipient daalo — naam likh ke Enter dabao'); return; }
+      if (!subject)     { showError('⚠️ Note ka title/subject daalo'); return; }
+      if (!body)        { showError('⚠️ Message likh ke bhejo'); return; }
 
       // Save to localStorage
       const sent = JSON.parse(localStorage.getItem('ns_sent') || '[]');
-      const note = { id: Date.now(), subject, body, to: tags, priority, time: new Date().toLocaleString() };
+      const category = document.getElementById('note-class').value || 'General';
+      const note = { id: Date.now(), subject, body, to: [...tags], priority, category, time: new Date().toLocaleString() };
       sent.unshift(note);
       localStorage.setItem('ns_sent', JSON.stringify(sent));
 
@@ -282,7 +299,11 @@
       document.getElementById('tag-input').value = '';
       document.getElementById('note-subject').value = '';
       document.getElementById('note-body').value = '';
+      document.getElementById('note-class').value = '';
       document.getElementById('file-list').innerHTML = '';
+      priority = 'low';
+      document.querySelectorAll('.pri-btn').forEach(b => b.className = 'pri-btn');
+      document.querySelector('.pri-btn').classList.add('sel-low');
 
       // Show banner
       const banner = document.getElementById('banner');
@@ -294,6 +315,14 @@
       el.className = 'sent-item';
       el.innerHTML = `<div class="sent-row"><div class="sent-title">${subject}</div><span class="badge badge-sent">Sent</span></div><div class="sent-to">To: ${note.to.join(', ')} · Just now</div>`;
       document.getElementById('sent-list').prepend(el);
+    }
+
+    function showError(msg) {
+      const banner = document.getElementById('banner');
+      banner.textContent = msg;
+      banner.style.background = '#ef4444';
+      banner.classList.add('show');
+      setTimeout(() => { banner.classList.remove('show'); banner.textContent = '✓ Note sent successfully!'; banner.style.background = 'var(--green)'; }, 3000);
     }
   </script>
 </body>
