@@ -1,348 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>NoteShare – Login</title>
+  <title>Notes Hub – Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #0f1117;
-      --card: #181c27;
-      --accent: #6c63ff;
-      --accent2: #a78bfa;
-      --text: #f0f0f5;
-      --muted: #8b8fa8;
-      --border: #2a2e3d;
-      --error: #f87171;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Ambient blobs */
-    body::before {
-      content: '';
-      position: fixed;
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(108,99,255,0.18) 0%, transparent 70%);
-      top: -150px; left: -150px;
-      pointer-events: none;
-    }
-    body::after {
-      content: '';
-      position: fixed;
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(167,139,250,0.12) 0%, transparent 70%);
-      bottom: -100px; right: -100px;
-      pointer-events: none;
-    }
-
-    .login-wrap {
-      width: 100%;
-      max-width: 420px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .brand {
-      text-align: center;
-      margin-bottom: 36px;
-    }
-    .brand-icon {
-      width: 52px; height: 52px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      margin-bottom: 12px;
-      box-shadow: 0 8px 24px rgba(108,99,255,0.35);
-    }
-    .brand h1 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 26px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-    .brand p {
-      color: var(--muted);
-      font-size: 14px;
-      margin-top: 4px;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 36px 32px;
-    }
-
-    .tabs {
-      display: flex;
-      background: var(--bg);
-      border-radius: 10px;
-      padding: 4px;
-      margin-bottom: 28px;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 9px;
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .tab-btn.active {
-      background: var(--accent);
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(108,99,255,0.4);
-    }
-
-    .form-group {
-      margin-bottom: 18px;
-    }
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--muted);
-      margin-bottom: 7px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    input {
-      width: 100%;
-      padding: 12px 14px;
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      font-size: 15px;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      outline: none;
-    }
-    input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(108,99,255,0.15);
-    }
-    input::placeholder { color: var(--border); }
-
-    .error-msg {
-      font-size: 12px;
-      color: var(--error);
-      margin-top: 5px;
-      display: none;
-    }
-
-    .forgot {
-      text-align: right;
-      margin-top: -10px;
-      margin-bottom: 18px;
-    }
-    .forgot a {
-      font-size: 12px;
-      color: var(--accent2);
-      text-decoration: none;
-    }
-    .forgot a:hover { text-decoration: underline; }
-
-    .btn-primary {
-      width: 100%;
-      padding: 13px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border: none;
-      border-radius: 10px;
-      color: #fff;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.15s;
-      box-shadow: 0 4px 16px rgba(108,99,255,0.35);
-    }
-    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn-primary:active { transform: translateY(0); }
-
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 22px 0;
-      color: var(--muted);
-      font-size: 12px;
-    }
-    .divider::before, .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    .btn-google {
-      width: 100%;
-      padding: 11px;
-      background: transparent;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      color: var(--text);
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .btn-google:hover { border-color: var(--accent2); background: rgba(108,99,255,0.05); }
-
-    /* Register panel */
-    #register-panel { display: none; }
-
-    .success-toast {
-      position: fixed;
-      bottom: 24px; left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: #22c55e;
-      color: #fff;
-      padding: 12px 24px;
-      border-radius: 10px;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 600;
-      font-size: 14px;
-      transition: transform 0.35s ease;
-      z-index: 999;
-    }
-    .success-toast.show { transform: translateX(-50%) translateY(0); }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0f1117;--card:#181c27;--accent:#6c63ff;--accent2:#a78bfa;--text:#f0f0f5;--muted:#8b8fa8;--border:#2a2e3d;--red:#f87171;--green:#22c55e}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden}
+    body::before{content:'';position:fixed;width:500px;height:500px;background:radial-gradient(circle,rgba(108,99,255,.18) 0%,transparent 70%);top:-150px;left:-150px;pointer-events:none}
+    body::after{content:'';position:fixed;width:400px;height:400px;background:radial-gradient(circle,rgba(167,139,250,.12) 0%,transparent 70%);bottom:-100px;right:-100px;pointer-events:none}
+    .wrap{width:100%;max-width:420px;position:relative;z-index:1}
+    .brand{text-align:center;margin-bottom:36px}
+    .brand-icon{width:52px;height:52px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px;box-shadow:0 8px 24px rgba(108,99,255,.35)}
+    .brand h1{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700}
+    .brand p{color:var(--muted);font-size:14px;margin-top:4px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px 32px}
+    .tabs{display:flex;background:var(--bg);border-radius:10px;padding:4px;margin-bottom:28px}
+    .tab-btn{flex:1;padding:9px;border:none;background:transparent;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;border-radius:8px;cursor:pointer;transition:all .2s}
+    .tab-btn.active{background:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(108,99,255,.4)}
+    .form-group{margin-bottom:18px}
+    label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:7px;text-transform:uppercase;letter-spacing:.5px}
+    input{width:100%;padding:12px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-size:15px;transition:border-color .2s,box-shadow .2s;outline:none;font-family:'Inter',sans-serif}
+    input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,99,255,.15)}
+    input::placeholder{color:#3a3e4d}
+    .btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s,transform .15s;box-shadow:0 4px 16px rgba(108,99,255,.35)}
+    .btn:hover{opacity:.9;transform:translateY(-1px)}
+    .btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .error-box{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--red);margin-bottom:16px;display:none}
+    .success-box{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--green);margin-bottom:16px;display:none}
+    #register-panel{display:none}
+    .loader{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin-right:8px;vertical-align:middle}
+    @keyframes spin{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
-
-  <div class="login-wrap">
-    <div class="brand">
-      <div class="brand-icon">📚</div>
-      <h1>NoteShare</h1>
-      <p>Your classroom, connected</p>
-    </div>
-
-    <div class="card">
-      <div class="tabs">
-        <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
-        <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Create Account</button>
-      </div>
-
-      <!-- LOGIN PANEL -->
-      <div id="login-panel">
-        <div class="form-group">
-          <label>Email / Student ID</label>
-          <input type="text" id="login-email" placeholder="e.g. student@school.edu" />
-          <div class="error-msg" id="err-email">Please enter your email or student ID.</div>
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="login-pass" placeholder="••••••••" />
-          <div class="error-msg" id="err-pass">Password cannot be empty.</div>
-        </div>
-        <div class="forgot"><a href="#">Forgot password?</a></div>
-        <button class="btn-primary" onclick="handleLogin()">Sign In →</button>
-        <div class="divider">or</div>
-        <button class="btn-google">
-          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-          Continue with Google
-        </button>
-      </div>
-
-      <!-- REGISTER PANEL -->
-      <div id="register-panel">
-        <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" id="reg-name" placeholder="Your full name" />
-        </div>
-        <div class="form-group">
-          <label>Student Email</label>
-          <input type="email" id="reg-email" placeholder="student@school.edu" />
-        </div>
-        <div class="form-group">
-          <label>Class / Section</label>
-          <input type="text" id="reg-class" placeholder="e.g. 10-A, CS-301" />
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="reg-pass" placeholder="Create a strong password" />
-        </div>
-        <button class="btn-primary" onclick="handleRegister()">Create Account →</button>
-      </div>
-    </div>
+<div class="wrap">
+  <div class="brand">
+    <div class="brand-icon">📚</div>
+    <h1>Notes Hub</h1>
+    <p>Your classroom, connected</p>
   </div>
 
-  <div class="success-toast" id="toast">✓ Logged in! Redirecting…</div>
+  <div class="card">
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+      <button class="tab-btn" id="tab-reg" onclick="switchTab('register')">Register</button>
+    </div>
 
-  <script>
-    function switchTab(tab) {
-      document.getElementById('login-panel').style.display = tab === 'login' ? 'block' : 'none';
-      document.getElementById('register-panel').style.display = tab === 'register' ? 'block' : 'none';
-      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
-      document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+    <div id="error-box" class="error-box"></div>
+    <div id="success-box" class="success-box"></div>
+
+    <!-- LOGIN -->
+    <div id="login-panel">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="student@school.edu"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <button class="btn" id="login-btn" onclick="doLogin()">Sign In →</button>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="register-panel">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="reg-name" placeholder="Apna poora naam"/>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="student@school.edu"/>
+      </div>
+      <div class="form-group">
+        <label>Class / Section</label>
+        <input type="text" id="reg-class" placeholder="e.g. 10-A, CS-301"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="reg-pass" placeholder="Minimum 6 characters" onkeydown="if(event.key==='Enter')doRegister()"/>
+      </div>
+      <button class="btn" id="reg-btn" onclick="doRegister()">Create Account →</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyADqcDzajzBja4t7Gx310bTLSColxcz2Ns",
+    authDomain: "school-29086.firebaseapp.com",
+    projectId: "school-29086",
+    storageBucket: "school-29086.firebasestorage.app",
+    messagingSenderId: "358547829043",
+    appId: "1:358547829043:web:0e105cb2d411654db14e46"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Agar already logged in hai to dashboard pe bhejo
+  onAuthStateChanged(auth, user => {
+    if (user) window.location.href = 'dashboard.html';
+  });
+
+  function showError(msg) {
+    const e = document.getElementById('error-box');
+    const s = document.getElementById('success-box');
+    s.style.display = 'none';
+    e.textContent = '⚠️ ' + msg;
+    e.style.display = 'block';
+  }
+  function showSuccess(msg) {
+    const e = document.getElementById('error-box');
+    const s = document.getElementById('success-box');
+    e.style.display = 'none';
+    s.textContent = '✓ ' + msg;
+    s.style.display = 'block';
+  }
+  function setLoading(btnId, loading) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = loading;
+    btn.innerHTML = loading ? '<span class="loader"></span> Please wait…' : btn.dataset.label;
+  }
+
+  document.getElementById('login-btn').dataset.label = 'Sign In →';
+  document.getElementById('reg-btn').dataset.label = 'Create Account →';
+
+  window.switchTab = function(tab) {
+    document.getElementById('login-panel').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('register-panel').style.display = tab === 'register' ? 'block' : 'none';
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-reg').classList.toggle('active', tab === 'register');
+    document.getElementById('error-box').style.display = 'none';
+    document.getElementById('success-box').style.display = 'none';
+  };
+
+  window.doLogin = async function() {
+    const email = document.getElementById('login-email').value.trim();
+    const pass  = document.getElementById('login-pass').value;
+    if (!email || !pass) { showError('Email aur password daalo'); return; }
+    setLoading('login-btn', true);
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+      // onAuthStateChanged redirect karega
+    } catch(e) {
+      setLoading('login-btn', false);
+      if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') showError('Email ya password galat hai');
+      else if (e.code === 'auth/too-many-requests') showError('Zyada attempts — thodi der baad try karo');
+      else showError(e.message);
     }
+  };
 
-    function showToast(msg, color = '#22c55e') {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.style.background = color;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3000);
+  window.doRegister = async function() {
+    const name  = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const cls   = document.getElementById('reg-class').value.trim();
+    const pass  = document.getElementById('reg-pass').value;
+    if (!name || !email || !pass) { showError('Saari fields bharo'); return; }
+    if (pass.length < 6) { showError('Password kam se kam 6 characters ka hona chahiye'); return; }
+    setLoading('reg-btn', true);
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      await updateProfile(cred.user, { displayName: name });
+      // Firestore mein user save karo
+      await setDoc(doc(db, 'users', cred.user.uid), {
+        name, email, cls, uid: cred.user.uid,
+        createdAt: serverTimestamp()
+      });
+      showSuccess('Account ban gaya! Redirect ho raha hai…');
+    } catch(e) {
+      setLoading('reg-btn', false);
+      if (e.code === 'auth/email-already-in-use') showError('Yeh email already registered hai — Sign In karo');
+      else if (e.code === 'auth/invalid-email') showError('Email format sahi nahi hai');
+      else showError(e.message);
     }
-
-    function handleLogin() {
-      const email = document.getElementById('login-email').value.trim();
-      const pass = document.getElementById('login-pass').value.trim();
-      let valid = true;
-
-      document.getElementById('err-email').style.display = 'none';
-      document.getElementById('err-pass').style.display = 'none';
-
-      if (!email) { document.getElementById('err-email').style.display = 'block'; valid = false; }
-      if (!pass)  { document.getElementById('err-pass').style.display = 'block'; valid = false; }
-
-      if (valid) {
-        // Save demo user to localStorage
-        localStorage.setItem('ns_user', JSON.stringify({ name: email.split('@')[0], email }));
-        showToast('✓ Logged in! Redirecting…');
-        setTimeout(() => window.location.href = 'dashboard.html', 1500);
-      }
-    }
-
-    function handleRegister() {
-      const name  = document.getElementById('reg-name').value.trim();
-      const email = document.getElementById('reg-email').value.trim();
-      const cls   = document.getElementById('reg-class').value.trim();
-      const pass  = document.getElementById('reg-pass').value.trim();
-      if (!name || !email || !pass) { showToast('Please fill all fields', '#f87171'); return; }
-      localStorage.setItem('ns_user', JSON.stringify({ name, email, cls }));
-      showToast('✓ Account created! Signing in…');
-      setTimeout(() => window.location.href = 'dashboard.html', 1500);
-    }
-  </script>
+  };
+</script>
 </body>
 </html>
