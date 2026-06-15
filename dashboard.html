@@ -3,186 +3,71 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>NoteShare – Dashboard</title>
+  <title>Notes Hub – Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #0f1117; --card: #181c27; --accent: #6c63ff; --accent2: #a78bfa;
-      --text: #f0f0f5; --muted: #8b8fa8; --border: #2a2e3d; --green: #22c55e;
-    }
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
-
-    /* SIDEBAR */
-    .sidebar {
-      width: 240px; min-height: 100vh;
-      background: var(--card);
-      border-right: 1px solid var(--border);
-      display: flex; flex-direction: column;
-      padding: 28px 16px;
-      position: fixed; left: 0; top: 0;
-    }
-    .logo { display: flex; align-items: center; gap: 10px; padding: 0 8px; margin-bottom: 36px; }
-    .logo-icon {
-      width: 38px; height: 38px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-    }
-    .logo span { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 18px; }
-
-    .nav-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); padding: 0 12px; margin-bottom: 8px; }
-    .nav-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 11px 12px;
-      border-radius: 10px;
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.2s;
-      margin-bottom: 4px;
-    }
-    .nav-item:hover { background: rgba(108,99,255,0.1); color: var(--text); }
-    .nav-item.active { background: linear-gradient(135deg, rgba(108,99,255,0.25), rgba(167,139,250,0.15)); color: var(--accent2); }
-    .nav-item .icon { font-size: 18px; width: 22px; text-align: center; }
-
-    .sidebar-footer { margin-top: auto; border-top: 1px solid var(--border); padding-top: 16px; }
-    .user-chip {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    .avatar {
-      width: 34px; height: 34px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 13px;
-      flex-shrink: 0;
-    }
-    .user-info { flex: 1; overflow: hidden; }
-    .user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .user-role { font-size: 11px; color: var(--muted); }
-
-    /* MAIN */
-    .main { margin-left: 240px; flex: 1; padding: 36px 40px; }
-
-    .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px; }
-    .topbar h2 { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; }
-    .topbar p { color: var(--muted); font-size: 14px; margin-top: 2px; }
-    .logout-btn {
-      padding: 8px 16px;
-      border: 1.5px solid var(--border);
-      background: transparent;
-      border-radius: 8px;
-      color: var(--muted);
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: 'Inter', sans-serif;
-    }
-    .logout-btn:hover { border-color: #f87171; color: #f87171; }
-
-    /* STATS ROW */
-    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
-    .stat-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-    }
-    .stat-icon { font-size: 22px; margin-bottom: 10px; }
-    .stat-num { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; }
-    .stat-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
-
-    /* QUICK ACTIONS */
-    .section-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 16px; font-weight: 600;
-      margin-bottom: 16px;
-    }
-    .actions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 32px; }
-    .action-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-      text-decoration: none;
-      color: var(--text);
-      display: flex; align-items: center; gap: 16px;
-      transition: all 0.25s;
-      cursor: pointer;
-    }
-    .action-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(108,99,255,0.15); }
-    .action-icon {
-      width: 52px; height: 52px;
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px;
-      flex-shrink: 0;
-    }
-    .action-text h3 { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; margin-bottom: 4px; }
-    .action-text p { font-size: 13px; color: var(--muted); }
-
-    /* RECENT ACTIVITY */
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .panel { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
-    .note-item {
-      display: flex; align-items: flex-start; gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .note-item:last-child { border-bottom: none; }
-    .note-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-top: 6px; flex-shrink: 0; }
-    .note-meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
-    .note-title { font-size: 14px; font-weight: 500; }
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .badge-new { background: rgba(108,99,255,0.2); color: var(--accent2); }
-    .badge-sent { background: rgba(34,197,94,0.15); color: var(--green); }
-
-    @media (max-width: 900px) {
-      .sidebar { display: none; }
-      .main { margin-left: 0; padding: 20px; }
-      .stats-row { grid-template-columns: repeat(2,1fr); }
-      .two-col { grid-template-columns: 1fr; }
-    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0f1117;--card:#181c27;--accent:#6c63ff;--accent2:#a78bfa;--text:#f0f0f5;--muted:#8b8fa8;--border:#2a2e3d;--green:#22c55e}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex}
+    .sidebar{width:240px;min-height:100vh;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:28px 16px;position:fixed;left:0;top:0}
+    .logo{display:flex;align-items:center;gap:10px;padding:0 8px;margin-bottom:36px}
+    .logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+    .logo span{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px}
+    .nav-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:0 12px;margin-bottom:8px}
+    .nav-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:all .2s;margin-bottom:4px}
+    .nav-item:hover{background:rgba(108,99,255,.1);color:var(--text)}
+    .nav-item.active{background:linear-gradient(135deg,rgba(108,99,255,.25),rgba(167,139,250,.15));color:var(--accent2)}
+    .nav-item .icon{font-size:18px;width:22px;text-align:center}
+    .sidebar-footer{margin-top:auto;border-top:1px solid var(--border);padding-top:16px}
+    .user-chip{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px}
+    .avatar{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;flex-shrink:0}
+    .user-name{font-size:13px;font-weight:600}
+    .user-role{font-size:11px;color:var(--muted)}
+    .main{margin-left:240px;flex:1;padding:36px 40px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px}
+    .topbar h2{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700}
+    .topbar p{color:var(--muted);font-size:14px;margin-top:2px}
+    .logout-btn{padding:8px 16px;border:1.5px solid var(--border);background:transparent;border-radius:8px;color:var(--muted);font-size:13px;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
+    .logout-btn:hover{border-color:#f87171;color:#f87171}
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
+    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px}
+    .stat-icon{font-size:22px;margin-bottom:10px}
+    .stat-num{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700}
+    .stat-label{font-size:12px;color:var(--muted);margin-top:2px}
+    .section-title{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:600;margin-bottom:16px}
+    .actions-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:32px}
+    .action-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;text-decoration:none;color:var(--text);display:flex;align-items:center;gap:16px;transition:all .25s}
+    .action-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 24px rgba(108,99,255,.15)}
+    .action-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+    .action-text h3{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;margin-bottom:4px}
+    .action-text p{font-size:13px;color:var(--muted)}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px}
+    .note-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+    .note-item:last-child{border-bottom:none}
+    .note-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:6px;flex-shrink:0}
+    .note-meta{font-size:11px;color:var(--muted);margin-top:3px}
+    .note-title{font-size:14px;font-weight:500}
+    .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;text-transform:uppercase}
+    .badge-sent{background:rgba(34,197,94,.15);color:var(--green)}
+    .badge-new{background:rgba(108,99,255,.2);color:var(--accent2)}
+    .empty-msg{color:var(--muted);font-size:13px;padding:16px 0}
+    @media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.stats-row{grid-template-columns:repeat(2,1fr)}.two-col{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-
   <aside class="sidebar">
-    <div class="logo">
-      <div class="logo-icon">📚</div>
-      <span>NoteShare</span>
-    </div>
-
+    <div class="logo"><div class="logo-icon">📚</div><span>Notes Hub</span></div>
     <div class="nav-label">Menu</div>
     <a href="dashboard.html" class="nav-item active"><span class="icon">🏠</span> Dashboard</a>
     <a href="send.html" class="nav-item"><span class="icon">📤</span> Send Notes</a>
     <a href="receive.html" class="nav-item"><span class="icon">📥</span> Receive Notes</a>
     <a href="friends.html" class="nav-item"><span class="icon">👥</span> Friends</a>
     <a href="profile.html" class="nav-item"><span class="icon">👤</span> Profile</a>
-
     <div class="sidebar-footer">
       <div class="user-chip">
         <div class="avatar" id="sb-avatar">?</div>
-        <div class="user-info">
-          <div class="user-name" id="sb-name">Student</div>
-          <div class="user-role">Student</div>
-        </div>
+        <div><div class="user-name" id="sb-name">Loading…</div><div class="user-role">Student</div></div>
       </div>
     </div>
   </aside>
@@ -190,117 +75,118 @@
   <main class="main">
     <div class="topbar">
       <div>
-        <h2>👋 Welcome back, <span id="greet-name">Student</span>!</h2>
-        <p>Here's what's happening today.</p>
+        <h2>👋 Welcome, <span id="greet-name">…</span>!</h2>
+        <p>Aaj ka overview dekho</p>
       </div>
-      <button class="logout-btn" onclick="logout()">Sign Out</button>
+      <button class="logout-btn" id="logout-btn">Sign Out</button>
     </div>
 
-    <!-- STATS -->
     <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-icon">📤</div>
-        <div class="stat-num" id="stat-sent">0</div>
-        <div class="stat-label">Notes Sent</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">📥</div>
-        <div class="stat-num" id="stat-received">0</div>
-        <div class="stat-label">Notes Received</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">👥</div>
-        <div class="stat-num" id="stat-friends">0</div>
-        <div class="stat-label">Friends</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">🔔</div>
-        <div class="stat-num" id="stat-unread">0</div>
-        <div class="stat-label">Unread</div>
-      </div>
+      <div class="stat-card"><div class="stat-icon">📤</div><div class="stat-num" id="stat-sent">…</div><div class="stat-label">Notes Sent</div></div>
+      <div class="stat-card"><div class="stat-icon">📥</div><div class="stat-num" id="stat-recv">…</div><div class="stat-label">Notes Received</div></div>
+      <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-num" id="stat-friends">…</div><div class="stat-label">Friends</div></div>
+      <div class="stat-card"><div class="stat-icon">🔔</div><div class="stat-num" id="stat-unread">…</div><div class="stat-label">Unread</div></div>
     </div>
 
-    <!-- QUICK ACTIONS -->
     <div class="section-title">Quick Actions</div>
     <div class="actions-grid">
-      <a href="send.html" class="action-card">
-        <div class="action-icon" style="background:rgba(108,99,255,0.15)">📤</div>
-        <div class="action-text">
-          <h3>Send Notes</h3>
-          <p>Share notes with classmates or friends</p>
-        </div>
-      </a>
-      <a href="receive.html" class="action-card">
-        <div class="action-icon" style="background:rgba(34,197,94,0.12)">📥</div>
-        <div class="action-text">
-          <h3>Receive Notes</h3>
-          <p>View notes shared with you</p>
-        </div>
-      </a>
-      <a href="friends.html" class="action-card">
-        <div class="action-icon" style="background:rgba(251,191,36,0.12)">👥</div>
-        <div class="action-text">
-          <h3>Friends</h3>
-          <p>Manage your classmates & connections</p>
-        </div>
-      </a>
-      <a href="profile.html" class="action-card">
-        <div class="action-icon" style="background:rgba(167,139,250,0.15)">👤</div>
-        <div class="action-text">
-          <h3>My Profile</h3>
-          <p>Update your info and preferences</p>
-        </div>
-      </a>
+      <a href="send.html" class="action-card"><div class="action-icon" style="background:rgba(108,99,255,.15)">📤</div><div class="action-text"><h3>Send Notes</h3><p>Classmates ko notes bhejo</p></div></a>
+      <a href="receive.html" class="action-card"><div class="action-icon" style="background:rgba(34,197,94,.12)">📥</div><div class="action-text"><h3>Receive Notes</h3><p>Tumhare liye aaye notes dekho</p></div></a>
+      <a href="friends.html" class="action-card"><div class="action-icon" style="background:rgba(251,191,36,.12)">👥</div><div class="action-text"><h3>Friends</h3><p>Classmates se connect karo</p></div></a>
+      <a href="profile.html" class="action-card"><div class="action-icon" style="background:rgba(167,139,250,.15)">👤</div><div class="action-text"><h3>My Profile</h3><p>Apni info update karo</p></div></a>
     </div>
 
-    <!-- RECENT -->
     <div class="two-col">
       <div class="panel">
         <div class="section-title">Recently Sent</div>
-        <div id="recent-sent"></div>
+        <div id="recent-sent"><div class="empty-msg">Loading…</div></div>
       </div>
       <div class="panel">
-        <div class="section-title">Abhi koi received notes nahi</div>
-        <p style="color:var(--muted);font-size:13px;margin-top:8px">Jab koi aapko note bhejega, yahan dikhega 📥</p>
+        <div class="section-title">Recently Received</div>
+        <div id="recent-recv"><div class="empty-msg">Loading…</div></div>
       </div>
     </div>
   </main>
 
-  <script>
-    const user = JSON.parse(localStorage.getItem('ns_user') || '{"name":"Student"}');
-    const name = user.name || 'Student';
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, collection, query, where, orderBy, limit, getDocs, getCountFromServer }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyADqcDzajzBja4t7Gx310bTLSColxcz2Ns",
+    authDomain: "school-29086.firebaseapp.com",
+    projectId: "school-29086",
+    storageBucket: "school-29086.firebasestorage.app",
+    messagingSenderId: "358547829043",
+    appId: "1:358547829043:web:0e105cb2d411654db14e46"
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href = 'login.html'; return; }
+
+    const name = user.displayName || user.email.split('@')[0];
     const initials = name.slice(0,2).toUpperCase();
-    document.getElementById('greet-name').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+    document.getElementById('greet-name').textContent = name;
     document.getElementById('sb-name').textContent = name;
     document.getElementById('sb-avatar').textContent = initials;
 
-    // Load real stats from localStorage
-    const sentNotes = JSON.parse(localStorage.getItem('ns_sent') || '[]');
-    document.getElementById('stat-sent').textContent = sentNotes.length;
-    document.getElementById('stat-received').textContent = 0;
-    document.getElementById('stat-friends').textContent = 0;
-    document.getElementById('stat-unread').textContent = 0;
+    // --- STATS ---
+    // Sent count
+    const sentSnap = await getCountFromServer(query(collection(db,'notes'), where('fromUid','==',user.uid)));
+    const sentCount = sentSnap.data().count;
+    document.getElementById('stat-sent').textContent = sentCount;
 
-    // Show recent sent notes
-    const recentSentEl = document.getElementById('recent-sent');
-    if (sentNotes.length === 0) {
-      recentSentEl.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:12px 0">Abhi tak koi note send nahi kiya. <a href="send.html" style="color:var(--accent2)">Pehla note bhejo →</a></p>';
+    // Received count
+    const recvSnap = await getCountFromServer(query(collection(db,'notes'), where('toUid','==',user.uid)));
+    const recvCount = recvSnap.data().count;
+    document.getElementById('stat-recv').textContent = recvCount;
+
+    // Unread count
+    const unreadSnap = await getCountFromServer(query(collection(db,'notes'), where('toUid','==',user.uid), where('read','==',false)));
+    document.getElementById('stat-unread').textContent = unreadSnap.data().count;
+
+    // Friends count
+    const friendsSnap = await getCountFromServer(query(collection(db,'friends'), where('uid','==',user.uid), where('status','==','accepted')));
+    document.getElementById('stat-friends').textContent = friendsSnap.data().count;
+
+    // --- RECENT SENT ---
+    const sentQ = query(collection(db,'notes'), where('fromUid','==',user.uid), orderBy('createdAt','desc'), limit(4));
+    const sentDocs = await getDocs(sentQ);
+    const sentEl = document.getElementById('recent-sent');
+    if (sentDocs.empty) {
+      sentEl.innerHTML = `<div class="empty-msg">Abhi tak koi note send nahi kiya. <a href="send.html" style="color:var(--accent2)">Pehla note bhejo →</a></div>`;
     } else {
-      recentSentEl.innerHTML = sentNotes.slice(0, 4).map(n => `
-        <div class="note-item">
-          <div class="note-dot" style="background:var(--green)"></div>
-          <div>
-            <div class="note-title">${n.subject} <span class="badge badge-sent">Sent</span></div>
-            <div class="note-meta">To: ${n.to.join(', ')} · ${n.time}</div>
-          </div>
-        </div>
-      `).join('');
+      sentEl.innerHTML = sentDocs.docs.map(d => {
+        const n = d.data();
+        const t = n.createdAt?.toDate ? n.createdAt.toDate().toLocaleString('en-PK',{dateStyle:'short',timeStyle:'short'}) : 'abhi';
+        return `<div class="note-item"><div class="note-dot" style="background:var(--green)"></div><div><div class="note-title">${n.subject} <span class="badge badge-sent">Sent</span></div><div class="note-meta">To: ${n.toName} · ${t}</div></div></div>`;
+      }).join('');
     }
 
-    function logout() {
-      localStorage.removeItem('ns_user');
-      window.location.href = 'login.html';
+    // --- RECENT RECEIVED ---
+    const recvQ = query(collection(db,'notes'), where('toUid','==',user.uid), orderBy('createdAt','desc'), limit(4));
+    const recvDocs = await getDocs(recvQ);
+    const recvEl = document.getElementById('recent-recv');
+    if (recvDocs.empty) {
+      recvEl.innerHTML = `<div class="empty-msg">Koi note receive nahi hua abhi 📭</div>`;
+    } else {
+      recvEl.innerHTML = recvDocs.docs.map(d => {
+        const n = d.data();
+        const t = n.createdAt?.toDate ? n.createdAt.toDate().toLocaleString('en-PK',{dateStyle:'short',timeStyle:'short'}) : 'abhi';
+        return `<div class="note-item"><div class="note-dot" style="background:${n.read?'var(--muted)':'var(--accent)'}"></div><div><div class="note-title">${n.subject} ${!n.read?'<span class="badge badge-new">New</span>':''}</div><div class="note-meta">From: ${n.fromName} · ${t}</div></div></div>`;
+      }).join('');
     }
-  </script>
+  });
+
+  document.getElementById('logout-btn').onclick = async () => {
+    await signOut(auth);
+    window.location.href = 'login.html';
+  };
+</script>
 </body>
 </html>
