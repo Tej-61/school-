@@ -3,112 +3,77 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>NoteShare – Send Notes</title>
+  <title>Notes Hub – Send Notes</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg:#0f1117;--card:#181c27;--accent:#6c63ff;--accent2:#a78bfa;--text:#f0f0f5;--muted:#8b8fa8;--border:#2a2e3d;--green:#22c55e; }
-    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0f1117;--card:#181c27;--accent:#6c63ff;--accent2:#a78bfa;--text:#f0f0f5;--muted:#8b8fa8;--border:#2a2e3d;--green:#22c55e;--red:#f87171}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex}
+    .sidebar{width:240px;min-height:100vh;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:28px 16px;position:fixed;left:0;top:0}
+    .logo{display:flex;align-items:center;gap:10px;padding:0 8px;margin-bottom:36px}
+    .logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+    .logo span{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px}
+    .nav-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:0 12px;margin-bottom:8px}
+    .nav-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:all .2s;margin-bottom:4px}
+    .nav-item:hover{background:rgba(108,99,255,.1);color:var(--text)}
+    .nav-item.active{background:linear-gradient(135deg,rgba(108,99,255,.25),rgba(167,139,250,.15));color:var(--accent2)}
+    .nav-item .icon{font-size:18px;width:22px;text-align:center}
+    .sidebar-footer{margin-top:auto;border-top:1px solid var(--border);padding-top:16px}
+    .user-chip{display:flex;align-items:center;gap:10px;padding:10px}
+    .avatar{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;flex-shrink:0}
+    .user-name{font-size:13px;font-weight:600}
+    .user-role{font-size:11px;color:var(--muted)}
+    .main{margin-left:240px;flex:1;padding:36px 40px}
+    .page-header{margin-bottom:32px}
+    .page-header h2{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700}
+    .page-header p{color:var(--muted);font-size:14px;margin-top:4px}
+    .compose-grid{display:grid;grid-template-columns:1fr 320px;gap:24px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px}
+    .card-title{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;margin-bottom:20px}
+    .form-group{margin-bottom:18px}
+    label{display:block;font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
+    input,select,textarea{width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:14px;transition:border-color .2s;outline:none}
+    input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,99,255,.12)}
+    textarea{resize:vertical;min-height:180px;line-height:1.6}
+    select option{background:var(--card)}
 
-    .sidebar { width:240px;min-height:100vh;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:28px 16px;position:fixed;left:0;top:0; }
-    .logo { display:flex;align-items:center;gap:10px;padding:0 8px;margin-bottom:36px; }
-    .logo-icon { width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px; }
-    .logo span { font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px; }
-    .nav-label { font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:0 12px;margin-bottom:8px; }
-    .nav-item { display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:all .2s;margin-bottom:4px; }
-    .nav-item:hover { background:rgba(108,99,255,.1);color:var(--text); }
-    .nav-item.active { background:linear-gradient(135deg,rgba(108,99,255,.25),rgba(167,139,250,.15));color:var(--accent2); }
-    .nav-item .icon { font-size:18px;width:22px;text-align:center; }
-    .sidebar-footer { margin-top:auto;border-top:1px solid var(--border);padding-top:16px; }
-    .user-chip { display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px; }
-    .avatar { width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;flex-shrink:0; }
-    .user-name { font-size:13px;font-weight:600; }
-    .user-role { font-size:11px;color:var(--muted); }
+    /* recipient search */
+    .recipient-search-wrap{position:relative}
+    .recipient-results{position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-top:4px;z-index:10;display:none;max-height:200px;overflow-y:auto}
+    .recipient-result-item{padding:10px 14px;cursor:pointer;font-size:14px;display:flex;align-items:center;gap:10px;transition:background .15s}
+    .recipient-result-item:hover{background:rgba(108,99,255,.1)}
+    .r-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:'Space Grotesk',sans-serif;flex-shrink:0}
+    .r-info .r-name{font-weight:600;font-size:13px}
+    .r-info .r-email{font-size:11px;color:var(--muted)}
+    .selected-recipient{background:rgba(108,99,255,.15);border:1px solid rgba(108,99,255,.3);border-radius:10px;padding:10px 14px;display:none;align-items:center;gap:10px;margin-top:8px}
+    .selected-recipient.show{display:flex}
+    .sel-name{font-weight:600;font-size:14px;flex:1}
+    .sel-clear{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px}
 
-    .main { margin-left:240px;flex:1;padding:36px 40px; }
-    .page-header { margin-bottom:32px; }
-    .page-header h2 { font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700; }
-    .page-header p { color:var(--muted);font-size:14px;margin-top:4px; }
-
-    .compose-grid { display:grid;grid-template-columns:1fr 340px;gap:24px; }
-
-    .card { background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px; }
-    .card-title { font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;margin-bottom:20px; }
-
-    .form-group { margin-bottom:18px; }
-    label { display:block;font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px; }
-    input, select, textarea {
-      width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;
-      color:var(--text);font-family:'Inter',sans-serif;font-size:14px;transition:border-color .2s,box-shadow .2s;outline:none;
-    }
-    input:focus, select:focus, textarea:focus { border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,99,255,.15); }
-    textarea { resize:vertical;min-height:200px;line-height:1.6; }
-    select option { background:var(--card); }
-
-    /* recipient tags */
-    .recipient-wrap {
-      background:var(--bg);border:1.5px solid var(--border);border-radius:10px;
-      padding:8px;display:flex;flex-wrap:wrap;gap:6px;min-height:44px;cursor:text;
-    }
-    .recipient-wrap:focus-within { border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,99,255,.15); }
-    .tag {
-      display:flex;align-items:center;gap:6px;background:rgba(108,99,255,.2);color:var(--accent2);
-      padding:3px 10px;border-radius:20px;font-size:13px;font-weight:500;
-    }
-    .tag button { background:none;border:none;color:var(--accent2);cursor:pointer;font-size:14px;line-height:1; }
-    .tag-input { background:none;border:none;outline:none;color:var(--text);font-size:14px;min-width:120px;padding:4px; }
-
-    /* file drop */
-    .drop-zone {
-      border:2px dashed var(--border);border-radius:12px;padding:28px;text-align:center;
-      transition:all .2s;cursor:pointer;
-    }
-    .drop-zone:hover, .drop-zone.dragover { border-color:var(--accent);background:rgba(108,99,255,.05); }
-    .drop-icon { font-size:32px;margin-bottom:8px; }
-    .drop-text { font-size:14px;color:var(--muted); }
-    .drop-text span { color:var(--accent2);cursor:pointer; }
-    #file-input { display:none; }
-    .file-list { margin-top:12px; }
-    .file-item { display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg);border-radius:8px;margin-bottom:6px;font-size:13px; }
-    .file-item .remove { margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px; }
-
-    /* priority */
-    .priority-group { display:flex;gap:8px; }
-    .pri-btn { flex:1;padding:8px;border:1.5px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;text-align:center; }
-    .pri-btn.sel-low { border-color:var(--green);color:var(--green);background:rgba(34,197,94,.1); }
-    .pri-btn.sel-normal { border-color:var(--accent);color:var(--accent2);background:rgba(108,99,255,.1); }
-    .pri-btn.sel-urgent { border-color:#f87171;color:#f87171;background:rgba(248,113,113,.1); }
-
-    .btn-send {
-      width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));
-      border:none;border-radius:10px;color:#fff;font-family:'Space Grotesk',sans-serif;
-      font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s,transform .15s;
-      box-shadow:0 4px 16px rgba(108,99,255,.35);
-    }
-    .btn-send:hover { opacity:.9;transform:translateY(-1px); }
-
-    /* sent list */
-    .sent-item { padding:14px 0;border-bottom:1px solid var(--border); }
-    .sent-item:last-child { border-bottom:none; }
-    .sent-row { display:flex;align-items:center;justify-content:space-between; }
-    .sent-title { font-size:14px;font-weight:500; }
-    .sent-to { font-size:12px;color:var(--muted);margin-top:3px; }
-    .badge { display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;text-transform:uppercase; }
-    .badge-sent { background:rgba(34,197,94,.15);color:var(--green); }
-    .badge-pending { background:rgba(251,191,36,.15);color:#f59e0b; }
-
-    .success-banner {
-      position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
-      background:var(--green);color:#fff;padding:12px 24px;border-radius:10px;
-      font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;
-      transition:transform .35s;z-index:99;
-    }
-    .success-banner.show { transform:translateX(-50%) translateY(0); }
+    .priority-group{display:flex;gap:8px}
+    .pri-btn{flex:1;padding:8px;border:1.5px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;text-align:center}
+    .pri-btn.sel-low{border-color:var(--green);color:var(--green);background:rgba(34,197,94,.1)}
+    .pri-btn.sel-normal{border-color:var(--accent);color:var(--accent2);background:rgba(108,99,255,.1)}
+    .pri-btn.sel-urgent{border-color:var(--red);color:var(--red);background:rgba(248,113,113,.1)}
+    .btn-send{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s;box-shadow:0 4px 16px rgba(108,99,255,.35)}
+    .btn-send:hover{opacity:.9}
+    .btn-send:disabled{opacity:.6;cursor:not-allowed}
+    .sent-item{padding:12px 0;border-bottom:1px solid var(--border)}
+    .sent-item:last-child{border-bottom:none}
+    .sent-row{display:flex;align-items:center;justify-content:space-between}
+    .sent-title{font-size:13px;font-weight:500}
+    .sent-to{font-size:11px;color:var(--muted);margin-top:2px}
+    .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;text-transform:uppercase}
+    .badge-sent{background:rgba(34,197,94,.15);color:var(--green)}
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);padding:12px 24px;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;transition:transform .35s;z-index:99;color:#fff}
+    .toast.show{transform:translateX(-50%) translateY(0)}
+    .hint{font-size:11px;color:var(--muted);margin-top:5px}
+    @media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}.compose-grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
   <aside class="sidebar">
-    <div class="logo"><div class="logo-icon">📚</div><span>NoteShare</span></div>
+    <div class="logo"><div class="logo-icon">📚</div><span>Notes Hub</span></div>
     <div class="nav-label">Menu</div>
     <a href="dashboard.html" class="nav-item"><span class="icon">🏠</span> Dashboard</a>
     <a href="send.html" class="nav-item active"><span class="icon">📤</span> Send Notes</a>
@@ -118,7 +83,7 @@
     <div class="sidebar-footer">
       <div class="user-chip">
         <div class="avatar" id="sb-avatar">?</div>
-        <div><div class="user-name" id="sb-name">Student</div><div class="user-role">Student</div></div>
+        <div><div class="user-name" id="sb-name">Loading…</div><div class="user-role">Student</div></div>
       </div>
     </div>
   </aside>
@@ -126,29 +91,34 @@
   <main class="main">
     <div class="page-header">
       <h2>📤 Send Notes</h2>
-      <p>Compose and share notes with your classmates</p>
+      <p>Kisi bhi registered student ko notes bhejo</p>
     </div>
 
     <div class="compose-grid">
-      <!-- COMPOSE FORM -->
       <div class="card">
         <div class="card-title">Compose Note</div>
 
         <div class="form-group">
-          <label>To (Recipients)</label>
-          <div class="recipient-wrap" id="recipient-wrap" onclick="document.getElementById('tag-input').focus()">
-            <input class="tag-input" id="tag-input" placeholder="Naam likho aur Enter dabao…" onkeydown="addTag(event)"/>
+          <label>To (Recipient)</label>
+          <div class="recipient-search-wrap">
+            <input type="text" id="recipient-input" placeholder="Student ka naam ya email type karo…" autocomplete="off" oninput="searchUsers(this.value)"/>
+            <div class="recipient-results" id="recipient-results"></div>
           </div>
-          <div style="font-size:11px;color:var(--muted);margin-top:5px">💡 Naam likh ke <b style="color:var(--accent2)">Enter</b> dabao — ek se zyada log bhi add kar sakte ho</div>
+          <div class="selected-recipient" id="selected-box">
+            <div class="r-avatar" id="sel-avatar">?</div>
+            <div class="sel-name" id="sel-name">-</div>
+            <button class="sel-clear" onclick="clearRecipient()">×</button>
+          </div>
+          <div class="hint">💡 Sirf registered students dhundhe ja sakte hain</div>
         </div>
 
         <div class="form-group">
-          <label>Note Title / Subject</label>
+          <label>Note Title</label>
           <input type="text" id="note-subject" placeholder="e.g. Chapter 5 – Organic Chemistry Notes"/>
         </div>
 
         <div class="form-group">
-          <label>Class / Topic Category</label>
+          <label>Category</label>
           <select id="note-class">
             <option value="">Select category…</option>
             <option>Mathematics</option>
@@ -164,166 +134,176 @@
 
         <div class="form-group">
           <label>Message</label>
-          <textarea id="note-body" placeholder="Write your note content here…"></textarea>
+          <textarea id="note-body" placeholder="Note ka content yahan likho…"></textarea>
         </div>
 
         <div class="form-group">
           <label>Priority</label>
           <div class="priority-group">
-            <button class="pri-btn sel-low" onclick="setPriority('low', this)">🟢 Low</button>
-            <button class="pri-btn" onclick="setPriority('normal', this)">🔵 Normal</button>
-            <button class="pri-btn" onclick="setPriority('urgent', this)">🔴 Urgent</button>
+            <button class="pri-btn sel-low" onclick="setPriority('low',this)">🟢 Low</button>
+            <button class="pri-btn" onclick="setPriority('normal',this)">🔵 Normal</button>
+            <button class="pri-btn" onclick="setPriority('urgent',this)">🔴 Urgent</button>
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Attachments</label>
-          <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDrag(event,true)" ondragleave="handleDrag(event,false)" ondrop="handleDrop(event)">
-            <div class="drop-icon">📎</div>
-            <div class="drop-text">Drag & drop files or <span>Browse</span></div>
-            <div style="font-size:11px;color:var(--muted);margin-top:4px">PDF, DOCX, PNG, JPG — up to 20MB each</div>
-          </div>
-          <input type="file" id="file-input" multiple onchange="addFiles(this.files)"/>
-          <div class="file-list" id="file-list"></div>
-        </div>
-
-        <button class="btn-send" onclick="sendNote()">Send Note →</button>
+        <button class="btn-send" id="send-btn" onclick="sendNote()">Send Note →</button>
       </div>
 
-      <!-- SENT NOTES SIDEBAR -->
-      <div>
-        <div class="card">
-          <div class="card-title">Sent Notes</div>
-          <div id="sent-list">
-            <p style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">Abhi tak koi note send nahi kiya 📭</p>
-          </div>
-        </div>
+      <div class="card">
+        <div class="card-title">Sent Notes</div>
+        <div id="sent-list"><div style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">Loading…</div></div>
       </div>
     </div>
   </main>
 
-  <div class="success-banner" id="banner">✓ Note sent successfully!</div>
+  <div class="toast" id="toast"></div>
 
-  <script>
-    const user = JSON.parse(localStorage.getItem('ns_user') || '{"name":"Student"}');
-    document.getElementById('sb-name').textContent = user.name;
-    document.getElementById('sb-avatar').textContent = (user.name||'S').slice(0,2).toUpperCase();
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, collection, addDoc, query, where, orderBy, limit, getDocs, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    let tags = [], priority = 'low', attachedFiles = [];
+  const firebaseConfig = {
+    apiKey: "AIzaSyADqcDzajzBja4t7Gx310bTLSColxcz2Ns",
+    authDomain: "school-29086.firebaseapp.com",
+    projectId: "school-29086",
+    storageBucket: "school-29086.firebasestorage.app",
+    messagingSenderId: "358547829043",
+    appId: "1:358547829043:web:0e105cb2d411654db14e46"
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-    // Load sent notes from localStorage on page load
-    function loadSentList() {
-      const sent = JSON.parse(localStorage.getItem('ns_sent') || '[]');
-      const list = document.getElementById('sent-list');
-      if (sent.length === 0) {
-        list.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">Abhi tak koi note send nahi kiya 📭</p>';
-        return;
-      }
-      list.innerHTML = sent.slice(0, 10).map(n => `
-        <div class="sent-item">
-          <div class="sent-row">
-            <div class="sent-title">${n.subject}</div>
-            <span class="badge badge-sent">Sent</span>
-          </div>
-          <div class="sent-to">To: ${n.to.join(', ')} · ${n.time}</div>
-        </div>
-      `).join('');
+  let currentUser = null;
+  let selectedRecipient = null;
+  let priority = 'low';
+  let searchTimeout = null;
+
+  onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href = 'login.html'; return; }
+    currentUser = user;
+    const name = user.displayName || user.email.split('@')[0];
+    document.getElementById('sb-name').textContent = name;
+    document.getElementById('sb-avatar').textContent = name.slice(0,2).toUpperCase();
+    loadSentNotes();
+  });
+
+  async function loadSentNotes() {
+    const q = query(collection(db,'notes'), where('fromUid','==',currentUser.uid), orderBy('createdAt','desc'), limit(10));
+    const snap = await getDocs(q);
+    const el = document.getElementById('sent-list');
+    if (snap.empty) {
+      el.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">Abhi tak koi note nahi bheja 📭</div>';
+      return;
     }
-    loadSentList();
+    el.innerHTML = snap.docs.map(d => {
+      const n = d.data();
+      const t = n.createdAt?.toDate ? n.createdAt.toDate().toLocaleString('en-PK',{dateStyle:'short',timeStyle:'short'}) : 'abhi';
+      return `<div class="sent-item"><div class="sent-row"><div class="sent-title">${n.subject}</div><span class="badge badge-sent">Sent</span></div><div class="sent-to">To: ${n.toName} · ${t}</div></div>`;
+    }).join('');
+  }
 
-    function addTag(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        const v = e.target.value.trim();
-        if (v && !tags.includes(v)) {
-          tags.push(v);
-          const tag = document.createElement('div');
-          tag.className = 'tag';
-          tag.innerHTML = `${v}<button onclick="removeTag('${v}', this.parentElement)">×</button>`;
-          document.getElementById('recipient-wrap').insertBefore(tag, e.target);
-        }
-        e.target.value = '';
-      }
-    }
-    function removeTag(val, el) { tags = tags.filter(t => t !== val); el.remove(); }
-
-    function setPriority(p, btn) {
-      priority = p;
-      document.querySelectorAll('.pri-btn').forEach(b => b.className = 'pri-btn');
-      btn.classList.add(`sel-${p}`);
-    }
-
-    function addFiles(files) {
-      [...files].forEach(f => {
-        attachedFiles.push(f);
-        const el = document.createElement('div');
-        el.className = 'file-item';
-        el.innerHTML = `📄 ${f.name} <span style="color:var(--muted);font-size:11px">(${(f.size/1024).toFixed(1)} KB)</span><button class="remove" onclick="this.parentElement.remove()">×</button>`;
-        document.getElementById('file-list').appendChild(el);
+  window.searchUsers = function(val) {
+    clearTimeout(searchTimeout);
+    const res = document.getElementById('recipient-results');
+    if (val.length < 2) { res.style.display = 'none'; return; }
+    searchTimeout = setTimeout(async () => {
+      const q = query(collection(db,'users'), where('email','>=',val), where('email','<=',val+'\uf8ff'), limit(5));
+      const q2 = query(collection(db,'users'), where('name','>=',val), where('name','<=',val+'\uf8ff'), limit(5));
+      const [snap1, snap2] = await Promise.all([getDocs(q), getDocs(q2)]);
+      const seen = new Set();
+      const users = [];
+      [...snap1.docs, ...snap2.docs].forEach(d => {
+        const u = d.data();
+        if (!seen.has(u.uid) && u.uid !== currentUser.uid) { seen.add(u.uid); users.push(u); }
       });
-    }
-
-    function handleDrag(e, over) { e.preventDefault(); document.getElementById('drop-zone').classList.toggle('dragover', over); }
-    function handleDrop(e) { e.preventDefault(); handleDrag(e, false); addFiles(e.dataTransfer.files); }
-
-    function sendNote() {
-      // Agar koi naam type kiya ho lekin Enter nahi kiya, usse bhi add kar lo
-      const inputVal = document.getElementById('tag-input').value.trim();
-      if (inputVal && !tags.includes(inputVal)) {
-        tags.push(inputVal);
-        const tag = document.createElement('div');
-        tag.className = 'tag';
-        tag.innerHTML = `${inputVal}<button onclick="removeTag('${inputVal}', this.parentElement)">×</button>`;
-        const inp = document.getElementById('tag-input');
-        document.getElementById('recipient-wrap').insertBefore(tag, inp);
-        inp.value = '';
+      if (users.length === 0) {
+        res.innerHTML = '<div style="padding:12px 14px;color:var(--muted);font-size:13px">Koi student nahi mila</div>';
+      } else {
+        res.innerHTML = users.map(u => `
+          <div class="recipient-result-item" onclick="selectUser('${u.uid}','${u.name}','${u.email}')">
+            <div class="r-avatar">${u.name.slice(0,2).toUpperCase()}</div>
+            <div class="r-info"><div class="r-name">${u.name}</div><div class="r-email">${u.email} ${u.cls ? '· '+u.cls : ''}</div></div>
+          </div>`).join('');
       }
+      res.style.display = 'block';
+    }, 300);
+  };
 
-      const subject = document.getElementById('note-subject').value.trim();
-      const body    = document.getElementById('note-body').value.trim();
+  window.selectUser = function(uid, name, email) {
+    selectedRecipient = { uid, name, email };
+    document.getElementById('recipient-input').value = '';
+    document.getElementById('recipient-results').style.display = 'none';
+    document.getElementById('sel-avatar').textContent = name.slice(0,2).toUpperCase();
+    document.getElementById('sel-name').textContent = `${name} (${email})`;
+    document.getElementById('selected-box').classList.add('show');
+  };
 
-      if (!tags.length) { showError('⚠️ Recipient daalo — naam likh ke Enter dabao'); return; }
-      if (!subject)     { showError('⚠️ Note ka title/subject daalo'); return; }
-      if (!body)        { showError('⚠️ Message likh ke bhejo'); return; }
+  window.clearRecipient = function() {
+    selectedRecipient = null;
+    document.getElementById('selected-box').classList.remove('show');
+    document.getElementById('recipient-input').value = '';
+  };
 
-      // Save to localStorage
-      const sent = JSON.parse(localStorage.getItem('ns_sent') || '[]');
-      const category = document.getElementById('note-class').value || 'General';
-      const note = { id: Date.now(), subject, body, to: [...tags], priority, category, time: new Date().toLocaleString() };
-      sent.unshift(note);
-      localStorage.setItem('ns_sent', JSON.stringify(sent));
+  window.setPriority = function(p, btn) {
+    priority = p;
+    document.querySelectorAll('.pri-btn').forEach(b => b.className = 'pri-btn');
+    btn.classList.add(`sel-${p}`);
+  };
 
-      // Reset form
-      tags = []; attachedFiles = [];
-      document.getElementById('recipient-wrap').querySelectorAll('.tag').forEach(t => t.remove());
-      document.getElementById('tag-input').value = '';
+  window.sendNote = async function() {
+    if (!selectedRecipient) { showToast('⚠️ Pehle recipient select karo', '#ef4444'); return; }
+    const subject = document.getElementById('note-subject').value.trim();
+    const body    = document.getElementById('note-body').value.trim();
+    const category = document.getElementById('note-class').value;
+    if (!subject) { showToast('⚠️ Note ka title daalo', '#ef4444'); return; }
+    if (!body)    { showToast('⚠️ Message likho', '#ef4444'); return; }
+
+    const btn = document.getElementById('send-btn');
+    btn.disabled = true; btn.textContent = 'Sending…';
+
+    try {
+      await addDoc(collection(db,'notes'), {
+        subject, body, category, priority,
+        fromUid: currentUser.uid,
+        fromName: currentUser.displayName || currentUser.email.split('@')[0],
+        fromEmail: currentUser.email,
+        toUid: selectedRecipient.uid,
+        toName: selectedRecipient.name,
+        toEmail: selectedRecipient.email,
+        read: false,
+        createdAt: serverTimestamp()
+      });
+      showToast('✓ Note successfully bhej diya!', '#22c55e');
       document.getElementById('note-subject').value = '';
       document.getElementById('note-body').value = '';
       document.getElementById('note-class').value = '';
-      document.getElementById('file-list').innerHTML = '';
+      clearRecipient();
       priority = 'low';
       document.querySelectorAll('.pri-btn').forEach(b => b.className = 'pri-btn');
       document.querySelector('.pri-btn').classList.add('sel-low');
-
-      // Show banner
-      const banner = document.getElementById('banner');
-      banner.classList.add('show');
-      setTimeout(() => banner.classList.remove('show'), 3000);
-
-      // Prepend to sent list
-      const el = document.createElement('div');
-      el.className = 'sent-item';
-      el.innerHTML = `<div class="sent-row"><div class="sent-title">${subject}</div><span class="badge badge-sent">Sent</span></div><div class="sent-to">To: ${note.to.join(', ')} · Just now</div>`;
-      document.getElementById('sent-list').prepend(el);
+      loadSentNotes();
+    } catch(e) {
+      showToast('❌ Error: ' + e.message, '#ef4444');
     }
+    btn.disabled = false; btn.textContent = 'Send Note →';
+  };
 
-    function showError(msg) {
-      const banner = document.getElementById('banner');
-      banner.textContent = msg;
-      banner.style.background = '#ef4444';
-      banner.classList.add('show');
-      setTimeout(() => { banner.classList.remove('show'); banner.textContent = '✓ Note sent successfully!'; banner.style.background = 'var(--green)'; }, 3000);
+  function showToast(msg, bg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.style.background = bg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // Close dropdown on outside click
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.recipient-search-wrap')) {
+      document.getElementById('recipient-results').style.display = 'none';
     }
-  </script>
+  });
+</script>
 </body>
 </html>
